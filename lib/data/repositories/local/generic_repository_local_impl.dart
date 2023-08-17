@@ -18,7 +18,7 @@ class GenericRepositoryLocalImpl implements GenericRepository {
   });
 
   @override
-  Future<List<BaseEntity>?> findAll() {
+  Future<List?> findAll() {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
 
