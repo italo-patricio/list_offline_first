@@ -25,10 +25,10 @@ class TodoListViewModel extends ChangeNotifier {
 
   BaseState get currentState => _currentState;
 
-  Future<void> addItem() async {
+  Future<void> addItem(Map<String, dynamic> value) async {
     final entity = TodoEntity(
-      title: 'Item A',
-      description: 'Eu sou o item',
+      title: value['title'],
+      description: value['description'],
     );
 
     try {

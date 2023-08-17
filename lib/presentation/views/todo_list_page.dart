@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:list_offline_first/domain/models/base_state.dart';
-import 'package:list_offline_first/domain/repositories/generic_repository.dart';
+import 'package:list_offline_first/presentation/views/bottom_sheet_input/bottom_sheet_widget.dart';
 import 'package:list_offline_first/presentation/views/todo_list_view_model.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -62,7 +62,8 @@ class _TodoListPageState extends State<TodoListPage> {
               );
             }
 
-            if (currentState is EmptyState) {
+            if (currentState is EmptyState ||
+                _todoListViewModel.todos.isEmpty) {
               return const Center(
                 child: Text('Nothing to see'),
               );
@@ -93,15 +94,30 @@ class _TodoListPageState extends State<TodoListPage> {
             );
           }),
       floatingActionButton: FloatingActionButton(
-          onPressed: addItem, child: const Icon(Icons.plus_one)),
+          onPressed: () => addItem(context), child: const Icon(Icons.plus_one)),
     );
   }
 
-  void addItem() {
-    _todoListViewModel.addItem();
+  void addItem(context) {
+    _settingModalBottomSheet(context);
   }
 
   void removeItem(int id) {
     _todoListViewModel.removeItem(id);
+  }
+
+  _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return BottomSheetInput(
+            onSave: (value) async {
+              await _todoListViewModel.addItem(value);
+              _todoListViewModel.loadData();
+              Navigator.pop(context);
+            },
+            onCancel: () => Navigator.pop(context),
+          );
+        });
   }
 }
