@@ -6,10 +6,10 @@ import 'package:list_offline_first/domain/models/base_entity.dart';
 import 'package:list_offline_first/domain/repositories/generic_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GenericRepositoryLocalImpl implements GenericRepository {
+class GenericRepositoryLocalImpl<T extends BaseEntity> implements GenericRepository<T> {
   final SharedPreferences _sharedPreferences;
   final String keyNamePreferences;
-  final Mapper _mapper;
+  final Mapper<Map<String, dynamic>, T> _mapper;
 
   GenericRepositoryLocalImpl(
     this._sharedPreferences,
@@ -18,7 +18,7 @@ class GenericRepositoryLocalImpl implements GenericRepository {
   });
 
   @override
-  Future<List?> findAll() {
+  Future<List<T>> findAll() {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
 
@@ -26,11 +26,11 @@ class GenericRepositoryLocalImpl implements GenericRepository {
         ?.map((element) => _mapper.fromJson(jsonDecode(element)))
         .toList();
 
-    return result != null ? Future.value(result) : Future.value(null);
+    return result != null ? Future.value(result) : Future.value([]);
   }
 
   @override
-  Future<BaseEntity?> findById(int id) {
+  Future<T?> findById(int id) {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
 
@@ -43,7 +43,7 @@ class GenericRepositoryLocalImpl implements GenericRepository {
   }
 
   @override
-  Future<BaseEntity> save(BaseEntity entity) {
+  Future<T> save(T entity) {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
     final r = Random();
@@ -57,7 +57,7 @@ class GenericRepositoryLocalImpl implements GenericRepository {
   }
 
   @override
-  Future<bool> update(int id, BaseEntity entity) {
+  Future<bool> update(int id, T entity) {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
 
@@ -83,7 +83,7 @@ class GenericRepositoryLocalImpl implements GenericRepository {
   }
 
   @override
-  Future delete(int id) async {
+  Future<bool> delete(int id) async {
     final List<String>? dataList =
         _sharedPreferences.getStringList(keyNamePreferences);
 

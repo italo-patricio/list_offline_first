@@ -5,13 +5,14 @@ import 'package:list_offline_first/domain/repositories/generic_repository.dart';
 import 'package:list_offline_first/presentation/views/todo_list_view_model.dart';
 
 class TodoListPage extends StatefulWidget {
-  final GenericRepository sharedRepository;
+  final TodoListViewModel todoListViewModel;
 
-  const TodoListPage({super.key, required this.sharedRepository});
+  const TodoListPage({super.key, required this.todoListViewModel});
 
   @override
   State<TodoListPage> createState() =>
-      _TodoListPageState(TodoListViewModel(sharedRepository));
+      // ignore: no_logic_in_create_state
+      _TodoListPageState(todoListViewModel);
 }
 
 class _TodoListPageState extends State<TodoListPage> {
@@ -30,7 +31,15 @@ class _TodoListPageState extends State<TodoListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await _todoListViewModel.loadData();
+              },
+              icon: const Icon(Icons.refresh))
+        ],
+      ),
       body: AnimatedBuilder(
           animation: _todoListViewModel,
           builder: (context, _) {

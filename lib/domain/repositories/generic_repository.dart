@@ -1,9 +1,7 @@
-import 'package:list_offline_first/domain/models/base_entity.dart';
-
-abstract class GenericRepository {
-  Future save(BaseEntity entity);
-  Future findAll();
-  Future findById(int id);
-  Future update(int id, BaseEntity entity);
-  Future delete(int id);
+abstract class GenericRepository<T> {
+  Future<T> save(T entity);
+  Future<List<T>> findAll();
+  Future<T?> findById(int id);
+  Future<bool> update(int id, T entity);
+  Future<bool> delete(int id);
 }

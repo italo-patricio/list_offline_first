@@ -1,51 +1,69 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:list_offline_first/domain/dtos/todo_item_dto.dart';
 import 'package:list_offline_first/domain/models/base_state.dart';
+import 'package:list_offline_first/domain/models/todo_entity.dart';
 import 'package:list_offline_first/domain/repositories/generic_repository.dart';
 
 class TodoListViewModel extends ChangeNotifier {
-  final GenericRepository _sharedRepository;
+  final GenericRepository<TodoEntity> _sharedRepository;
 
-  BaseState _currentState = InitState([]);
+  BaseState _currentState = InitState<TodoItemDto>([]);
 
-  final List<TodoItemDto> _todos = [];
+  final List<TodoEntity> _todos = [];
 
   TodoListViewModel(this._sharedRepository);
 
-  List<TodoItemDto> get todos => _todos;
+  List<TodoItemDto> get todos => _todos
+      .map(
+        (e) => TodoItemDto(
+          e.id,
+          e.title ?? '',
+          e.description ?? '',
+        ),
+      )
+      .toList();
 
   BaseState get currentState => _currentState;
 
-  addItem() {
-    final random = Random();
-    final id = random.nextInt(1000);
-    _todos.add(
-    TodoItemDto(
-      id,
-      'Item $id',
-      'eu sou o item',
-    ),
+  Future<void> addItem() async {
+    final entity = TodoEntity(
+      title: 'Item A',
+      description: 'Eu sou o item',
     );
 
-    // _sharedRepository.save(
-
-    // );
-
-    _currentState = SuccessState(todos);
+    try {
+      await _sharedRepository.save(entity);
+      _currentState = SuccessState(todos);
+    } catch (e) {
+      print(e);
+      _currentState = FailureState([]);
+    }
 
     notifyListeners();
   }
 
-  removeItem(int id) {
+  removeItem(int id) async {
     _todos.removeWhere((e) => e.id == id);
+    await _sharedRepository.delete(id);
     notifyListeners();
   }
 
   Future<void> loadData() async {
-    await Future.delayed(const Duration(seconds: 2));
-    addItem();
-    addItem();
+    enableLoading();
+    _todos.clear();
+    try {
+      final results = await _sharedRepository.findAll();
+      _todos.addAll(results);
+      _currentState = SuccessState(todos);
+    } catch (e) {
+      print(e);
+      _currentState = FailureState([]);
+    }
+    notifyListeners();
+  }
+
+  enableLoading() {
+    _currentState = LoadingState([]);
+    notifyListeners();
   }
 }

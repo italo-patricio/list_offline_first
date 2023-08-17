@@ -1,23 +1,23 @@
 import 'package:list_offline_first/domain/dtos/todo_item_dto.dart';
 
-abstract class BaseState {
-  final List<TodoItemDto> todos;
+abstract class BaseState<T> {
+  final List<T> todos;
 
   BaseState(this.todos);
 }
 
-class InitState extends BaseState {
+class InitState<T> extends BaseState<T> {
   InitState(super.todos);
 }
-class LoadingState extends BaseState {
+class LoadingState<T> extends BaseState<T> {
   LoadingState(super.todos);
 }
-class EmptyState extends BaseState {
+class EmptyState<T> extends BaseState<T> {
   EmptyState(super.todos);
 }
-class SuccessState extends BaseState {
+class SuccessState<T> extends BaseState<T> {
   SuccessState(super.todos);
 }
-class FailureState extends BaseState {
+class FailureState<T> extends BaseState<T> {
   FailureState(super.todos);
 }
